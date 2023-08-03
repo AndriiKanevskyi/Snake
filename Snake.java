@@ -36,7 +36,7 @@ public boolean checkCollision(GameObject object){
 public int getLength(){
         return snakeParts.size();
 }
-    public void move(Apple apple){
+    public void move(Apple apple, RabbitBonus bonus){
         GameObject newHead;
         newHead= createNewHead();
 
@@ -54,7 +54,8 @@ public int getLength(){
         if (newHead.x==apple.x&&newHead.y==apple.y){
             apple.isAlive=false;
 
-        }else { removeTail();}}
+        }
+        if (newHead.x==bonus.x&&newHead.y==bonus.y){bonus.isAlive=false;}else { removeTail();}}
 
     };
 

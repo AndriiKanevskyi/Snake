@@ -2,16 +2,21 @@ package com.javarush.games.snake;
 
 import com.javarush.engine.cell.*;
 
+import java.util.Random;
+
 public class SnakeGame extends Game {
     public static final int WIDTH =15;
     public static final int HEIGHT =15;
     private Snake snake;
     private int turnDelay;
     private Apple apple;
+    private RabbitBonus rabbitBonus;
     private boolean isGameStopped;
     private int score;
-
+    private int turnNum=0;
+    // private int scoreStep=5;
     private static final int GOAL =28;
+    Random random = new Random();
 
 private void win(){
     stopTurnTimer();
@@ -24,19 +29,39 @@ private void createNewApple(){
     while (snake.checkCollision(apple)){apple = new Apple(getRandomNumber(WIDTH),getRandomNumber(HEIGHT));}
 }
 
+    private void createNewRabbitBonus(){
+
+        rabbitBonus = new RabbitBonus(getRandomNumber(WIDTH),getRandomNumber(HEIGHT));
+        while (snake.checkCollision(rabbitBonus)){rabbitBonus = new RabbitBonus(getRandomNumber(WIDTH),getRandomNumber(HEIGHT));}
+    }
+
     @Override
     public void onTurn(int step) {
-        snake.move(apple);
+
+        snake.move(apple,rabbitBonus);
         if (!apple.isAlive){
             score=score+5;
             setScore(score);
             turnDelay=turnDelay-10;
             setTurnTimer(turnDelay);
-            createNewApple();}
+            createNewApple();
+        }
+
+        if (!rabbitBonus.isAlive){
+            score=score+10;
+            setScore(score);
+            turnDelay=turnDelay-10;
+            setTurnTimer(turnDelay);
+            if (random.nextBoolean()==true){
+                createNewRabbitBonus();
+            }
+        }
+
+
         if (!snake.isAlive){gameOver();}
         if (snake.getLength()>GOAL){
             win();}
-
+        turnNum++;
         drawScene();
 
 
@@ -57,6 +82,7 @@ private void createNewApple(){
         turnDelay = 300;
         setTurnTimer(turnDelay);
         createNewApple();
+        createNewRabbitBonus();
         drawScene();
 
     }
@@ -73,6 +99,8 @@ private void createNewApple(){
         }
         snake.draw(this);
         apple.draw(this);
+        rabbitBonus.draw(this);
+        //setCellValueEx(WIDTH-1,HEIGHT-1,Color.RED,String.valueOf(turnNum));
     }
     @Override
     public void onKeyPress(Key key){
